@@ -1,30 +1,24 @@
 package blockchain
 
 import (
-	"crypto/sha256"
 	"fmt"
+	"sync"
 )
 
 type blockchain struct {
-	blocks []Block
+	blocks []*Block
 }
 
 var b *blockchain
+var once sync.Once
 
 func (b *blockchain) getLastHash() string {
-
-	if len(b.blocks) > 0 {
-		return b.blocks[len(b.blocks)-1].Hash
+	totalBlocks := len(GetChain().blocks)
+	if totalBlocks == 0 {
+		return ""
 	}
-	return ""
 
-}
-
-func (b *blockchain) AddBlock(data string) {
-	newBlock := Block{data, "", b.getLastHash()}
-	hash := sha256.Sum256([]byte(newBlock.Data + newBlock.PrevHash))
-	newBlock.Hash = fmt.Sprintf("%x", hash)
-	b.blocks = append(b.blocks, newBlock)
+	return GetChain().blocks[totalBlocks-1].Hash
 }
 
 func (b *blockchain) ListBlocks() {
@@ -35,7 +29,19 @@ func (b *blockchain) ListBlocks() {
 	}
 }
 
+func createBlock(data string) *Block {
+	newBlock := &Block{data, "", b.getLastHash()}
+	newBlock.calculateHash()
+	return newBlock
+
+}
+
 func GetChain() *blockchain {
-	b = &blockchain{}
+	if b == nil {
+		once.Do(func() {
+			b = &blockchain{}
+			b.blocks = append(b.blocks, createBlock("Genesis Block"))
+		})
+	}
 	return b
 }
