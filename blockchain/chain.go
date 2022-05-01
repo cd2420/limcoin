@@ -1,7 +1,6 @@
 package blockchain
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -21,12 +20,12 @@ func (b *blockchain) getLastHash() string {
 	return GetChain().blocks[totalBlocks-1].Hash
 }
 
-func (b *blockchain) ListBlocks() {
-	for _, block := range b.blocks {
-		fmt.Printf("Data : %s \n", block.Data)
-		fmt.Printf("Hash : %s \n", block.Hash)
-		fmt.Printf("Prev Hash : %s \n\n", block.PrevHash)
-	}
+func (b *blockchain) AllBlocks() []*Block {
+	return b.blocks
+}
+
+func (b *blockchain) AddBlock(data string) {
+	b.blocks = append(b.blocks, createBlock(data))
 }
 
 func createBlock(data string) *Block {
@@ -40,7 +39,7 @@ func GetChain() *blockchain {
 	if b == nil {
 		once.Do(func() {
 			b = &blockchain{}
-			b.blocks = append(b.blocks, createBlock("Genesis Block"))
+			b.AddBlock("Genesis Block")
 		})
 	}
 	return b

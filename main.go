@@ -1,8 +1,19 @@
 package main
 
-import "github.com/cd2420/limcoin/blockchain"
+import (
+	"fmt"
+
+	"github.com/cd2420/limcoin/blockchain"
+)
 
 func main() {
 	chain := blockchain.GetChain()
-	chain.ListBlocks()
+	chain.AddBlock("Second Block!")
+	chain.AddBlock("Third Block!")
+	chain.AddBlock("Fourth Block!")
+	for _, block := range chain.AllBlocks() {
+		fmt.Printf("Data: %s\n", block.Data)
+		fmt.Printf("Hash: %s\n", block.Hash)
+		fmt.Printf("Prev Hash: %s\n\n", block.PrevHash)
+	}
 }
